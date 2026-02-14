@@ -1,0 +1,8 @@
+{
+  "/page": "app/page.js",
+  "/phishing/page": "app/phishing/page.js",
+  "/reports/page": "app/reports/page.js",
+  "/heatmap/page": "app/heatmap/page.js",
+  "/vault/page": "app/vault/page.js",
+  "/quiz/page": "app/quiz/page.js"
+}
