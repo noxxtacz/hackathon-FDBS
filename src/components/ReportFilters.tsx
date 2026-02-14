@@ -17,12 +17,15 @@ export default function ReportFilters({
   onGovernorateChange,
   onThreatTypeChange,
 }: Props) {
+  const selectClass =
+    "rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-gray-300 backdrop-blur focus:border-cyan-500/50 focus:outline-none focus:ring-1 focus:ring-cyan-500/30 transition-all";
+
   return (
     <div className="mb-6 flex flex-wrap gap-4">
       <div>
         <label
           htmlFor="gov-filter"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500"
         >
           Governorate
         </label>
@@ -30,7 +33,7 @@ export default function ReportFilters({
           id="gov-filter"
           value={selectedGovernorate}
           onChange={(e) => onGovernorateChange(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+          className={selectClass}
         >
           <option value="">All</option>
           {governorates.map((g) => (
@@ -44,7 +47,7 @@ export default function ReportFilters({
       <div>
         <label
           htmlFor="type-filter"
-          className="mb-1 block text-sm font-medium text-gray-700"
+          className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500"
         >
           Threat Type
         </label>
@@ -52,7 +55,7 @@ export default function ReportFilters({
           id="type-filter"
           value={selectedThreatType}
           onChange={(e) => onThreatTypeChange(e.target.value)}
-          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
+          className={selectClass}
         >
           <option value="">All</option>
           {threatTypes.map((t) => (

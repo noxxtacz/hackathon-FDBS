@@ -3,8 +3,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "ShieldsUp",
-  description: "Cybersecurity awareness & threat reporting platform",
+  title: "AmanTN — Cybersecurity Awareness",
+  description: "AI-powered cybersecurity awareness & threat reporting platform",
 };
 
 export default function RootLayout({
@@ -13,12 +13,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>
+    <html lang="en" className="dark">
+      <body className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
-        <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-400">
-          © {new Date().getFullYear()} ShieldsUp — Stay safe online.
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
+          {children}
+        </main>
+        <footer className="border-t border-white/5 py-6 text-center text-sm text-gray-600">
+          © {new Date().getFullYear()} AmanTN — Stay safe online.
         </footer>
       </body>
     </html>

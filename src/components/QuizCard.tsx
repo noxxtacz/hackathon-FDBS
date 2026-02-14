@@ -20,19 +20,20 @@ export default function QuizCard({
   correctIndex,
 }: Props) {
   return (
-    <Card className="max-w-xl">
-      <p className="mb-4 text-lg font-medium text-gray-900">{question}</p>
+    <Card className="max-w-2xl">
+      <p className="mb-5 text-lg font-semibold leading-relaxed text-white">{question}</p>
 
       <ul className="space-y-2">
         {options.map((opt, i) => {
           let style =
-            "border border-gray-200 hover:border-blue-400 hover:bg-blue-50";
+            "border border-white/10 bg-white/[0.02] text-gray-300 hover:border-cyan-500/30 hover:bg-cyan-500/5 hover:text-white";
 
           if (answered) {
-            if (i === correctIndex) style = "border-2 border-green-500 bg-green-50";
+            if (i === correctIndex)
+              style = "border-emerald-500/30 bg-emerald-500/10 text-emerald-400";
             else if (i === selectedIndex)
-              style = "border-2 border-red-400 bg-red-50";
-            else style = "border border-gray-200 opacity-60";
+              style = "border-red-500/30 bg-red-500/10 text-red-400";
+            else style = "border-white/5 bg-white/[0.01] text-gray-600";
           }
 
           return (
@@ -40,8 +41,11 @@ export default function QuizCard({
               <button
                 disabled={answered}
                 onClick={() => onAnswer(i)}
-                className={`w-full rounded-lg px-4 py-2 text-left text-sm transition-colors ${style}`}
+                className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm transition-all duration-200 ${style}`}
               >
+                <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-current text-xs font-semibold opacity-60">
+                  {String.fromCharCode(65 + i)}
+                </span>
                 {opt}
               </button>
             </li>
