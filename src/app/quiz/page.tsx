@@ -7,6 +7,8 @@ import Card from "@/components/Card";
 import Button from "@/components/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 /* ── Types matching API responses ──────────────────────────── */
 
@@ -56,6 +58,8 @@ const selectClass =
 /* ── Component ──────────────────────────────────────────────── */
 
 export default function QuizPage() {
+  const { language } = useLanguage();
+
   // Config
   const [topic, setTopic] = useState("");
   const [difficulty, setDifficulty] = useState("");
@@ -99,7 +103,7 @@ export default function QuizPage() {
     setAnswerStreak(0);
 
     try {
-      const body: Record<string, unknown> = { count };
+      const body: Record<string, unknown> = { count, language };
       if (topic) body.topic = topic;
       if (difficulty) body.difficulty = difficulty;
 
@@ -110,7 +114,7 @@ export default function QuizPage() {
       });
 
       if (res.status === 401) {
-        setError("Please log in to play the quiz.");
+        setError(t("quiz.loginRequired", language));
         return;
       }
 
@@ -128,7 +132,7 @@ export default function QuizPage() {
     } finally {
       setLoading(false);
     }
-  }, [count, topic, difficulty]);
+  }, [count, topic, difficulty, language]);
 
   /* ── Answer question ─────────────────────────────────────── */
 
@@ -227,8 +231,8 @@ export default function QuizPage() {
     return (
       <>
         <PageHeader
-          title="Security Quiz"
-          subtitle="Test your cybersecurity knowledge with real-world scenarios."
+          title={t("quiz.title", language)}
+          subtitle={t("quiz.subtitle", language)}
         />
 
         <div className="mx-auto max-w-lg">
@@ -242,16 +246,16 @@ export default function QuizPage() {
               </div>
             </div>
 
-            <h2 className="mb-1 text-lg font-semibold text-white">Configure Your Quiz</h2>
+            <h2 className="mb-1 text-lg font-semibold text-white">{t("quiz.configure", language)}</h2>
             <p className="mb-5 text-sm text-gray-500">
-              Questions are generated from real phishing reports and our cybersecurity question bank.
+              {t("quiz.configSubtitle", language)}
             </p>
 
             {/* Config options */}
             <div className="space-y-4 text-left">
               <div>
                 <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Topic
+                  {t("quiz.topic", language)}
                 </label>
                 <select value={topic} onChange={(e) => setTopic(e.target.value)} className={selectClass + " w-full"}>
                   {TOPICS.map((t) => (
@@ -262,7 +266,7 @@ export default function QuizPage() {
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Difficulty
+                  {t("quiz.difficulty", language)}
                 </label>
                 <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)} className={selectClass + " w-full"}>
                   {DIFFICULTIES.map((d) => (
@@ -273,7 +277,7 @@ export default function QuizPage() {
 
               <div>
                 <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Questions
+                  {t("quiz.questions", language)}
                 </label>
                 <div className="flex gap-2">
                   {COUNTS.map((c) => (
@@ -294,7 +298,7 @@ export default function QuizPage() {
             </div>
 
             <Button onClick={startQuiz} className="mt-6 w-full">
-              Start Quiz
+              {t("quiz.start", language)}
             </Button>
 
             {error && (
@@ -313,7 +317,7 @@ export default function QuizPage() {
   if (loading) {
     return (
       <>
-        <PageHeader title="Security Quiz" subtitle="Preparing your questions..." />
+        <PageHeader title={t("quiz.title", language)} subtitle={t("quiz.preparing", language)} />
         <LoadingSpinner />
       </>
     );
@@ -336,7 +340,7 @@ export default function QuizPage() {
 
     return (
       <>
-        <PageHeader title="Quiz Complete!" />
+        <PageHeader title={t("quiz.complete", language)} />
         <div className="mx-auto max-w-md">
           <Card className="animate-slide-up text-center">
             {/* Score circle */}
@@ -345,8 +349,7 @@ export default function QuizPage() {
             </div>
 
             <p className="text-gray-400">
-              You got <span className="font-semibold text-white">{correct}</span> out of{" "}
-              <span className="font-semibold text-white">{total}</span> correct.
+              {t("quiz.gotCorrect", language)}: <span className="font-semibold text-white">{correct}</span> / <span className="font-semibold text-white">{total}</span>
             </p>
 
             {/* Streak badges */}
@@ -357,19 +360,19 @@ export default function QuizPage() {
                     {s.daily.current}
                   </p>
                   <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-orange-400/60">
-                    Daily Streak
+                    {t("streak.daily", language)}
                   </p>
-                  <p className="text-[10px] text-gray-600">Best: {s.daily.best}</p>
+                  <p className="text-[10px] text-gray-600">{t("streak.best", language)}: {s.daily.best}</p>
                 </div>
                 <div className="rounded-xl border border-purple-500/10 bg-purple-500/5 px-3 py-3 text-center">
                   <p className="text-2xl font-bold text-purple-400">
                     {s.answer.best}
                   </p>
                   <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-purple-400/60">
-                    Best Answer Streak
+                    {t("quiz.bestAnswerStreak", language)}
                   </p>
                   <p className="text-[10px] text-gray-600">
-                    Consecutive correct
+                    {t("quiz.consecutiveCorrect", language)}
                   </p>
                 </div>
               </div>
@@ -377,7 +380,7 @@ export default function QuizPage() {
 
             {pct < 80 && (
               <p className="mt-3 text-sm text-gray-500">
-                Tip: Review phishing indicators and password best practices.
+                {t("quiz.reviewTip", language)}
               </p>
             )}
 
@@ -392,7 +395,7 @@ export default function QuizPage() {
               variant="secondary"
               className="mt-5 w-full"
             >
-              Play Again
+              {t("quiz.playAgain", language)}
             </Button>
           </Card>
         </div>
@@ -407,8 +410,8 @@ export default function QuizPage() {
   return (
     <>
       <PageHeader
-        title="Security Quiz"
-        subtitle={`Question ${currentIdx + 1} of ${questions.length}`}
+        title={t("quiz.title", language)}
+        subtitle={`${t("quiz.question", language)} ${currentIdx + 1} ${t("quiz.of", language)} ${questions.length}`}
       />
 
       {/* Progress bar */}
@@ -425,20 +428,20 @@ export default function QuizPage() {
       <div className="mb-4 flex items-center justify-between text-xs text-gray-500">
         <div className="flex items-center gap-4">
           <span>
-            Score: <span className="font-medium text-white">{score}/{questions.length}</span>
+            {t("quiz.score", language)}: <span className="font-medium text-white">{score}/{questions.length}</span>
           </span>
           {answerStreak > 1 && (
             <span className="flex items-center gap-1 text-orange-400">
               <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2c.4 0 .7.2.9.5l3.4 5.8 6.5 1a1 1 0 01.6 1.7l-4.7 4.6 1.1 6.5a1 1 0 01-1.5 1l-5.8-3-5.8 3a1 1 0 01-1.5-1l1.1-6.5L1.6 11a1 1 0 01.6-1.7l6.5-1L12.1 2.5a1 1 0 01.9-.5z" />
               </svg>
-              {answerStreak} streak
+              {answerStreak} {t("quiz.streak", language)}
             </span>
           )}
         </div>
         {q.source === "report_generated" && (
           <span className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 text-[10px] font-medium text-cyan-400">
-            From real report
+            {t("quiz.fromReport", language)}
           </span>
         )}
       </div>
@@ -465,7 +468,7 @@ export default function QuizPage() {
             }`}
           >
             <span className="font-semibold">
-              {answerResult.isCorrect ? "Correct!" : "Incorrect"}
+              {answerResult.isCorrect ? t("quiz.correct", language) : t("quiz.incorrect", language)}
             </span>
             {answerResult.explanation && (
               <p className="mt-1 text-xs text-gray-400">{answerResult.explanation}</p>
@@ -475,12 +478,12 @@ export default function QuizPage() {
           {/* Tip */}
           {answerResult.tip && (
             <div className="rounded-xl border border-cyan-500/10 bg-cyan-500/5 px-4 py-2.5 text-sm text-cyan-300">
-              <span className="font-semibold">Tip:</span> {answerResult.tip}
+              <span className="font-semibold">{t("quiz.tip", language)}:</span> {answerResult.tip}
             </div>
           )}
 
           <Button variant="primary" onClick={handleNext}>
-            {currentIdx + 1 >= questions.length ? "See Results" : "Next →"}
+            {currentIdx + 1 >= questions.length ? t("quiz.seeResults", language) : t("quiz.next", language)}
           </Button>
         </div>
       )}

@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { count, topic, difficulty } = parsed.data;
+    const { count, topic, difficulty, language } = parsed.data;
 
     // 1. Load recent reports for Groq-based question generation
     const reports = await getRecentReports(10);
@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
           count: reportCount,
           topic,
           difficulty,
+          language,
         })
       : [];
 

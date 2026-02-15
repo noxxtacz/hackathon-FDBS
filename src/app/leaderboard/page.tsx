@@ -5,6 +5,8 @@ import PageHeader from "@/components/PageHeader";
 import Card from "@/components/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 interface LeaderboardEntry {
   rank: number;
@@ -17,6 +19,7 @@ interface LeaderboardEntry {
 const medal = ["", "🥇", "🥈", "🥉"];
 
 export default function LeaderboardPage() {
+  const { language } = useLanguage();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -46,7 +49,7 @@ export default function LeaderboardPage() {
   if (loading) {
     return (
       <>
-        <PageHeader title="Scoreboard" subtitle="Loading rankings…" />
+        <PageHeader title={t("leaderboard.title", language)} subtitle={t("error.loading", language)} />
         <LoadingSpinner />
       </>
     );
@@ -55,14 +58,14 @@ export default function LeaderboardPage() {
   if (error) {
     return (
       <>
-        <PageHeader title="Scoreboard" />
+        <PageHeader title={t("leaderboard.title", language)} />
         <div className="mx-auto max-w-md">
           <Toast type="error" message={error} onDismiss={() => setError("")} />
           <button
             onClick={fetchData}
             className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-400 hover:bg-white/10 hover:text-white transition"
           >
-            Retry
+            {t("action.retry", language)}
           </button>
         </div>
       </>
@@ -72,8 +75,8 @@ export default function LeaderboardPage() {
   return (
     <>
       <PageHeader
-        title="Scoreboard"
-        subtitle="Top cyber-aware users ranked by streak and contributions."
+        title={t("leaderboard.title", language)}
+        subtitle={t("leaderboard.subtitle", language)}
       />
 
       <div className="mx-auto max-w-2xl">

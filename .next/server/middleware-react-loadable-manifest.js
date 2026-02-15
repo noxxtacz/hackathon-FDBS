@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST="{}"
+self.__REACT_LOADABLE_MANIFEST="{\"app/dashboard/page.tsx -> @/components/TunisiaHeatMap\":{\"id\":\"app/dashboard/page.tsx -> @/components/TunisiaHeatMap\",\"files\":[\"static/css/_app-pages-browser_src_components_TunisiaHeatMap_tsx.css\",\"static/chunks/_app-pages-browser_src_components_TunisiaHeatMap_tsx.js\"]}}"
