@@ -11,6 +11,7 @@
    ------------------------------------------------------------------ */
 
 import { GroqQuestionsSchema, type QuizQuestion, type Topic, type Difficulty } from "./schemas";
+import { buildLanguageInstruction, type Language } from "@/lib/i18n";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
 const GROQ_MODEL = process.env.GROQ_QUIZ_MODEL ?? "meta-llama/llama-4-scout-17b-16e-instruct";
@@ -41,7 +42,8 @@ function buildPrompt(
   reports: ReportSummary[],
   count: number,
   topic?: Topic,
-  difficulty?: Difficulty
+  difficulty?: Difficulty,
+  language: Language = "en"
 ): string {
   const reportBlock = reports
     .map(
@@ -57,8 +59,21 @@ function buildPrompt(
 
   const topicHint = topic ? `Focus on the topic "${topic}".` : "";
   const diffHint = difficulty ? `Target difficulty: ${difficulty}.` : "";
+  const langInstruction = buildLanguageInstruction(language);
+
+  // Extra guidance for Tunisian Derja mode
+  const tnExtra = language === "tn"
+    ? `\nTunisian Derja style rules:
+- Use relatable Tunisian scenarios (e.g. receiving a suspicious SMS, fake Ooredoo/Orange message, fake Poste Tunisienne delivery)
+- Sprinkle light Tunisian expressions like "ياخي", "موش معقول", "برا شوف", "يعطيك الصحة" — but keep it natural
+- Do NOT use profanity or insults
+- Explanations and tips should feel like a friend advising you, short and warm`
+    : "";
 
   return `You are a cybersecurity educator creating quiz questions from real phishing analysis reports.
+
+Language instruction: ${langInstruction}${tnExtra}
+IMPORTANT: All JSON keys must remain in English. Only the values (question text, options, explanation, tip) should follow the language instruction.
 
 Given the reports below, generate exactly ${count} multiple-choice questions.
 Each question must:
@@ -95,6 +110,7 @@ export async function generateQuestionsFromReports(params: {
   count: number;
   topic?: Topic;
   difficulty?: Difficulty;
+  language?: Language;
 }): Promise<QuizQuestion[]> {
   if (!GROQ_API_KEY || params.reports.length === 0 || params.count === 0) {
     return [];
@@ -105,7 +121,8 @@ export async function generateQuestionsFromReports(params: {
       params.reports,
       params.count,
       params.topic,
-      params.difficulty
+      params.difficulty,
+      params.language ?? "en"
     );
 
     const res = await fetch(GROQ_API_URL, {
@@ -120,7 +137,7 @@ export async function generateQuestionsFromReports(params: {
           {
             role: "system",
             content:
-              "You are a cybersecurity quiz generator. Output ONLY valid JSON arrays. Never include markdown or explanation outside the JSON.",
+              "You are a cybersecurity quiz generator. Output ONLY valid JSON arrays. Never include markdown or explanation outside the JSON. All JSON keys must be in English; only values follow the requested language.",
           },
           { role: "user", content: prompt },
         ],

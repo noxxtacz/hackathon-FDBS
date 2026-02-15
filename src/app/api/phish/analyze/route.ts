@@ -24,6 +24,7 @@ import {
 } from "@/lib/phish/heuristics";
 import { ocrImage } from "@/lib/phish/ocr";
 import { generatePhishReport, type PhishReport } from "@/lib/phish/groq";
+import { parseLanguage, type Language } from "@/lib/i18n";
 
 /* ── Simple in-memory rate limiter (per IP, 10 req / min) ──── */
 
@@ -78,6 +79,7 @@ export async function POST(
     let extractedText = "";
     let extractedUrls: string[] = [];
     const allSignals: HeuristicSignal[] = [];
+    let language: Language = "en";
 
     /* ── Branch A: JSON body (URL input) ───────────────────── */
     if (contentType.includes("application/json")) {
@@ -91,6 +93,7 @@ export async function POST(
 
       inputType = "url";
       const normalized = normalizeUrl(body.url);
+      language = parseLanguage(body.language);
       if (!normalized) {
         return NextResponse.json(
           { success: false, error: "Invalid URL" },
@@ -126,6 +129,10 @@ export async function POST(
       }
 
       inputType = "image";
+
+      // Read language from form field
+      const langField = formData.get("language");
+      language = parseLanguage(langField);
 
       // Read buffer & run OCR
       const arrayBuf = await file.arrayBuffer();
@@ -163,6 +170,7 @@ export async function POST(
       extractedText,
       extractedUrls,
       heuristics: { riskScore, signals: allSignals },
+      language,
     });
 
     return NextResponse.json({

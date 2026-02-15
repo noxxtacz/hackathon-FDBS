@@ -236,6 +236,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/api/reports/heatmap/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/reports/heatmap">> = Specific
+  const handler = {} as typeof import("../../src/app/api/reports/heatmap/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/api/reports/list/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/reports/list">> = Specific

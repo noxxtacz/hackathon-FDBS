@@ -2,10 +2,22 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import PageHeader from "@/components/PageHeader";
 import Card from "@/components/Card";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
+
+const TunisiaHeatMap = dynamic(() => import("@/components/TunisiaHeatMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[500px] items-center justify-center rounded-2xl border border-white/5 bg-white/[0.02]">
+      <LoadingSpinner />
+    </div>
+  ),
+});
 
 /* ── Types ──────────────────────────────────────────────────── */
 
@@ -187,6 +199,7 @@ function ProgressBar({ value, max, color }: { value: number; max: number; color:
 /* ── Main Page ───────────────────────────────────────────────── */
 
 export default function DashboardPage() {
+  const { language } = useLanguage();
   const [data, setData] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -197,7 +210,7 @@ export default function DashboardPage() {
     try {
       const res = await fetch("/api/dashboard/summary");
       if (res.status === 401) {
-        setError("Please log in to view your dashboard.");
+        setError(t("dashboard.loginRequired", language));
         return;
       }
       const json = await res.json();
@@ -222,7 +235,7 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <>
-        <PageHeader title="Dashboard" subtitle="Loading your cyber-awareness overview…" />
+        <PageHeader title={t("nav.dashboard", language)} subtitle={t("dashboard.loading", language)} />
         <LoadingSpinner />
       </>
     );
@@ -233,14 +246,14 @@ export default function DashboardPage() {
   if (error || !data) {
     return (
       <>
-        <PageHeader title="Dashboard" />
+        <PageHeader title={t("nav.dashboard", language)} />
         <div className="mx-auto max-w-md">
           <Toast type="error" message={error || "Unknown error"} onDismiss={() => setError("")} />
           <button
             onClick={fetchData}
             className="mt-4 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-400 transition hover:bg-white/10 hover:text-white"
           >
-            Retry
+            {t("action.retry", language)}
           </button>
         </div>
       </>
@@ -255,40 +268,40 @@ export default function DashboardPage() {
   return (
     <>
       <PageHeader
-        title={`Welcome back${data.user.name ? `, ${data.user.name}` : ""}`}
-        subtitle="Your cyber-awareness overview at a glance."
+        title={`${t("dashboard.welcome", language)}${data.user.name ? `, ${data.user.name}` : ""}`}
+        subtitle={t("dashboard.subtitle", language)}
       />
 
       {/* ── KPI Grid ──────────────────────────────────────── */}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
-          label="Phishing Analyzed"
+          label={t("dashboard.analyzed", language)}
           value={phishing.analyzedCount}
           icon={icons.shield}
           accent="text-cyan-400"
-          sub={`${phishing.reportedCount} reported`}
+          sub={`${phishing.reportedCount} ${t("dashboard.reported", language)}`}
         />
         <KpiCard
-          label="High Risk Found"
+          label={t("dashboard.highRisk", language)}
           value={phishing.highRiskCount}
           icon={icons.alert}
           accent="text-red-400"
-          sub={phishing.analyzedCount > 0 ? `${Math.round((phishing.highRiskCount / phishing.analyzedCount) * 100)}% of total` : undefined}
+          sub={phishing.analyzedCount > 0 ? `${Math.round((phishing.highRiskCount / phishing.analyzedCount) * 100)}% ${t("dashboard.ofTotal", language)}` : undefined}
         />
         <KpiCard
-          label="Daily Streak"
+          label={t("streak.daily", language)}
           value={quiz.dailyStreak.current}
           icon={icons.fire}
           accent="text-orange-400"
-          sub={`Best: ${quiz.dailyStreak.best}`}
+          sub={`${t("dashboard.best", language)}: ${quiz.dailyStreak.best}`}
         />
         <KpiCard
-          label="Last Quiz Score"
+          label={t("dashboard.lastScore", language)}
           value={quiz.lastSession ? `${lastPct}%` : "—"}
           icon={icons.trophy}
           accent="text-purple-400"
-          sub={quiz.lastSession ? `${quiz.lastSession.correct}/${quiz.lastSession.total} correct` : "No quizzes yet"}
+          sub={quiz.lastSession ? `${quiz.lastSession.correct}/${quiz.lastSession.total} ${t("quiz.gotCorrect", language)}` : t("quiz.noQuizzes", language)}
         />
       </div>
 
@@ -299,15 +312,15 @@ export default function DashboardPage() {
         <div className="lg:col-span-2">
           <Card>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-white">Recent Reports</h3>
+              <h3 className="text-sm font-semibold text-white">{t("dashboard.recentReports", language)}</h3>
               <Link href="/reports" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
-                View all →
+                {t("dashboard.viewAll", language)}
               </Link>
             </div>
 
             {phishing.lastReports.length === 0 ? (
               <p className="py-8 text-center text-sm text-gray-600">
-                No reports yet. Analyze a URL to get started.
+                {t("dashboard.noReports", language)}
               </p>
             ) : (
               <div className="overflow-x-auto">
@@ -353,10 +366,10 @@ export default function DashboardPage() {
         <div className="space-y-4">
           {/* Daily Streak */}
           <Card>
-            <h3 className="mb-3 text-sm font-semibold text-white">Daily Streak</h3>
+            <h3 className="mb-3 text-sm font-semibold text-white">{t("streak.daily", language)}</h3>
             <div className="flex items-end gap-3">
               <span className="text-4xl font-bold text-orange-400">{quiz.dailyStreak.current}</span>
-              <span className="mb-1 text-xs text-gray-600">/ {quiz.dailyStreak.best} best</span>
+              <span className="mb-1 text-xs text-gray-600">/ {quiz.dailyStreak.best} {t("dashboard.best", language).toLowerCase()}</span>
             </div>
             <div className="mt-3">
               <ProgressBar
@@ -366,16 +379,16 @@ export default function DashboardPage() {
               />
             </div>
             <p className="mt-2 text-[11px] text-gray-600">
-              {quiz.dailyStreak.current > 0 ? "Keep it up — play a quiz every day!" : "Start a quiz to begin your streak."}
+              {quiz.dailyStreak.current > 0 ? t("dashboard.keepItUp", language) : t("dashboard.startStreak", language)}
             </p>
           </Card>
 
           {/* Answer Streak */}
           <Card>
-            <h3 className="mb-3 text-sm font-semibold text-white">Answer Streak</h3>
+            <h3 className="mb-3 text-sm font-semibold text-white">{t("streak.answer", language)}</h3>
             <div className="flex items-end gap-3">
               <span className="text-4xl font-bold text-purple-400">{quiz.answerStreak.current}</span>
-              <span className="mb-1 text-xs text-gray-600">/ {quiz.answerStreak.best} best</span>
+              <span className="mb-1 text-xs text-gray-600">/ {quiz.answerStreak.best} {t("dashboard.best", language).toLowerCase()}</span>
             </div>
             <div className="mt-3">
               <ProgressBar
@@ -385,7 +398,7 @@ export default function DashboardPage() {
               />
             </div>
             <p className="mt-2 text-[11px] text-gray-600">
-              Consecutive correct answers. One wrong resets it!
+              {t("dashboard.consecutiveCorrect", language)}
             </p>
           </Card>
 
@@ -396,9 +409,9 @@ export default function DashboardPage() {
                 {icons.lock}
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Vault</h3>
+                <h3 className="text-sm font-semibold text-white">{t("vault.title", language)}</h3>
                 <p className="text-xs text-gray-500">
-                  {data.vault.isUnlocked ? "Set up & secured" : "Not configured yet"}
+                  {data.vault.isUnlocked ? t("vault.setup", language) : t("vault.notSetup", language)}
                 </p>
               </div>
             </div>
@@ -409,13 +422,25 @@ export default function DashboardPage() {
       {/* ── Quick Actions ─────────────────────────────────── */}
 
       <div className="mt-6">
-        <h3 className="mb-3 text-sm font-semibold text-white">Quick Actions</h3>
+        <h3 className="mb-3 text-sm font-semibold text-white">{t("dashboard.quickActions", language)}</h3>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <QuickAction href="/phishing" icon={icons.shield} label="Analyze URL" accent="text-cyan-400" />
-          <QuickAction href="/phishing?mode=image" icon={icons.camera} label="Screenshot" accent="text-blue-400" />
-          <QuickAction href="/quiz" icon={icons.play} label="Start Quiz" accent="text-emerald-400" />
-          <QuickAction href="/vault" icon={icons.lock} label="Open Vault" accent="text-amber-400" />
+          <QuickAction href="/phishing" icon={icons.shield} label={t("action.analyze", language)} accent="text-cyan-400" />
+          <QuickAction href="/phishing?mode=image" icon={icons.camera} label={t("dashboard.screenshot", language)} accent="text-blue-400" />
+          <QuickAction href="/quiz" icon={icons.play} label={t("action.startQuiz", language)} accent="text-emerald-400" />
+          <QuickAction href="/vault" icon={icons.lock} label={t("action.openVault", language)} accent="text-amber-400" />
         </div>
+      </div>
+
+      {/* ── Heatmap ───────────────────────────────────────── */}
+
+      <div className="mt-6">
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-white">{t("dashboard.heatmapTitle", language)}</h3>
+          <Link href="/heatmap" className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors">
+            {t("dashboard.fullView", language)}
+          </Link>
+        </div>
+        <TunisiaHeatMap />
       </div>
 
       {/* ── Quiz Summary ──────────────────────────────────── */}
@@ -425,9 +450,9 @@ export default function DashboardPage() {
           <Card>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h3 className="text-sm font-semibold text-white">Quiz History</h3>
+                <h3 className="text-sm font-semibold text-white">{t("dashboard.quizHistory", language)}</h3>
                 <p className="text-xs text-gray-500">
-                  {quiz.totalSessions} session{quiz.totalSessions !== 1 ? "s" : ""} completed
+                  {quiz.totalSessions} {t("dashboard.sessionsCompleted", language)}
                 </p>
               </div>
               {quiz.lastSession && (
@@ -446,7 +471,7 @@ export default function DashboardPage() {
                 className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 px-4 py-2 text-xs font-semibold text-slate-950 transition hover:brightness-110"
               >
                 {icons.play}
-                Play Again
+                {t("quiz.playAgain", language)}
               </Link>
             </div>
           </Card>

@@ -7,6 +7,7 @@
    ------------------------------------------------------------------ */
 
 import type { HeuristicSignal } from "./heuristics";
+import { buildLanguageInstruction, parseLanguage, type Language } from "@/lib/i18n";
 
 /* ── Public types ───────────────────────────────────────────── */
 
@@ -37,6 +38,7 @@ export interface PhishReportInput {
     riskScore: number;
     signals: HeuristicSignal[];
   };
+  language?: Language;
 }
 
 /* ── Model config ───────────────────────────────────────────── */
@@ -50,13 +52,20 @@ const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const SYSTEM_PROMPT = `You are a senior cybersecurity analyst specializing in phishing detection.
 Analyze the submitted content and produce a structured JSON report.
 Be cautious: it is better to over-warn than to miss a real phishing attempt.
-Return ONLY valid JSON — no markdown, no code fences, no prose outside the JSON object.`;
+Return ONLY valid JSON — no markdown, no code fences, no prose outside the JSON object.
+IMPORTANT: All JSON keys must remain in English. Only the values (text content) should be in the requested language.`;
 
 function buildUserPrompt(input: PhishReportInput): string {
+  const lang = parseLanguage(input.language);
+  const langInstruction = buildLanguageInstruction(lang);
   // Truncate extracted text to avoid prompt-injection surface & token blow-up
   const safeText = (input.extractedText ?? "").slice(0, 3000);
 
   return `Analyze the following for phishing indicators.
+
+Language instruction: ${langInstruction}
+Write all text values (summary, findings, actions, education, etc.) following the language instruction above.
+All JSON keys MUST remain in English.
 
 Input type: ${input.inputType}
 ${input.url ? `Submitted URL: ${input.url}` : ""}

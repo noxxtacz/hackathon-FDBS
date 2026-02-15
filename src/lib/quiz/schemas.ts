@@ -4,6 +4,11 @@
 
 import { z } from "zod";
 
+/* ── Language enum (matches lib/i18n.ts) ───────────────────── */
+
+export const LanguageEnum = z.enum(["en", "ar", "tn"]);
+export type QuizLanguage = z.infer<typeof LanguageEnum>;
+
 /* ── Shared enums ──────────────────────────────────────────── */
 
 export const TopicEnum = z.enum([
@@ -54,6 +59,7 @@ export const StartQuizRequestSchema = z.object({
   count: z.number().int().min(1).max(10).default(5),
   topic: TopicEnum.optional(),
   difficulty: DifficultyEnum.optional(),
+  language: LanguageEnum.optional().default("en"),
 });
 export type StartQuizRequest = z.infer<typeof StartQuizRequestSchema>;
 

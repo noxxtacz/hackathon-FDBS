@@ -8,6 +8,8 @@ import Button from "@/components/Button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Toast from "@/components/Toast";
 import Modal from "@/components/Modal";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { t } from "@/lib/i18n";
 
 /* ── Types matching /api/phish/analyze response ─────────────── */
 
@@ -74,6 +76,8 @@ function severityDot(sev: string) {
 /* ── Component ──────────────────────────────────────────────── */
 
 export default function PhishingPage() {
+  const { language } = useLanguage();
+
   // Input state
   const [url, setUrl] = useState("");
   const [inputMode, setInputMode] = useState<"url" | "image">("url");
@@ -109,13 +113,14 @@ export default function PhishingPage() {
         res = await fetch("/api/phish/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "url", url }),
+          body: JSON.stringify({ type: "url", url, language }),
         });
       } else {
         if (!selectedFile) { setLoading(false); return; }
         const form = new FormData();
         form.append("type", "image");
         form.append("file", selectedFile);
+        form.append("language", language);
         res = await fetch("/api/phish/analyze", {
           method: "POST",
           body: form,
@@ -194,8 +199,8 @@ export default function PhishingPage() {
   return (
     <>
       <PageHeader
-        title="Phishing Scanner"
-        subtitle="Paste a URL or upload a screenshot to analyze for phishing indicators."
+        title={t("phish.title", language)}
+        subtitle={t("phish.subtitle", language)}
       />
 
       {/* ── Input Card ──────────────────────────────────────── */}
