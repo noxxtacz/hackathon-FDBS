@@ -50,10 +50,10 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-400 to-blue-500 text-sm font-black text-slate-950 transition-transform duration-200 group-hover:scale-110">
-            A
+            F
           </div>
           <span className="text-lg font-bold tracking-tight text-white">
-            Aman<span className="text-cyan-400">TN</span>
+            faya9ni<span className="text-cyan-400">.tn</span>
           </span>
         </Link>
 

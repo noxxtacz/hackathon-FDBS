@@ -231,15 +231,15 @@ const TRANSLATIONS: Record<string, Record<Language, string>> = {
   "home.title1": { en: "Stay One Step Ahead of", ar: "ابقَ متقدماً على", tn: "خلّيك سابق" },
   "home.title2": { en: "Cyber Threats", ar: "التهديدات السيبرانية", tn: "التهديدات السيبرانية" },
   "home.subtitle": {
-    en: "AmanTN helps you detect phishing, manage passwords, and level up your cybersecurity skills — all through an engaging, gamified experience built for Tunisia.",
-    ar: "أمانTN يساعدك في كشف التصيّد وإدارة كلمات المرور وتطوير مهاراتك — بتجربة تفاعلية مصممة لتونس.",
-    tn: "أمانTN يعاونك تكتشف التصيّد وتنظّم كلمات السر — بتجربة لعب مصممة لتونس.",
+    en: "faya9ni.tn helps you detect phishing, manage passwords, and level up your cybersecurity skills — all through an engaging, gamified experience built for Tunisia.",
+    ar: "فيّقني يساعدك في كشف التصيّد وإدارة كلمات المرور وتطوير مهاراتك — بتجربة تفاعلية مصممة لتونس.",
+    tn: "فيّقني يعاونك تكتشف التصيّد وتنظّم كلمات السر — بتجربة لعب مصممة لتونس.",
   },
   "home.getStarted": { en: "Get Started Free", ar: "ابدأ مجاناً", tn: "ابدا مجاناً" },
   "home.learnMore": { en: "Learn More", ar: "اعرف أكثر", tn: "اعرف أكثر" },
   "home.features": { en: "Everything you need to stay safe online", ar: "كل ما تحتاجه للبقاء آمناً", tn: "كل شي تحتاجو باش تبقى آمن" },
   "home.featuresSubtitle": {
-    en: "From AI-powered phishing detection to community-driven threat intelligence — AmanTN has you covered.",
+    en: "From AI-powered phishing detection to community-driven threat intelligence — faya9ni.tn has you covered.",
     ar: "من كشف التصيّد بالذكاء الاصطناعي إلى معلومات التهديد المجتمعية.",
     tn: "من كشف التصيّد بالذكاء الاصطناعي للتقارير متع الناس.",
   },
@@ -249,9 +249,9 @@ const TRANSLATIONS: Record<string, Record<Language, string>> = {
     tn: "مستعد تطوّر وعيك الأمني؟",
   },
   "home.ctaSubtitle": {
-    en: "Join the AmanTN community and start protecting yourself today.",
-    ar: "انضم لمجتمع أمانTN وابدأ حماية نفسك اليوم.",
-    tn: "انضم لمجتمع أمانTN وابدا أحمي روحك.",
+    en: "Join the faya9ni.tn community and start protecting yourself today.",
+    ar: "انضم لمجتمع فيّقني وابدأ حماية نفسك اليوم.",
+    tn: "انضم لمجتمع فيّقني وابدا أحمي روحك.",
   },
 
   // Feature cards

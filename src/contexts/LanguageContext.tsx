@@ -16,7 +16,7 @@ const LanguageContext = createContext<LanguageContextValue>({
   dir: "ltr",
 });
 
-const STORAGE_KEY = "aman-lang";
+const STORAGE_KEY = "faya9ni-lang";
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>("en");

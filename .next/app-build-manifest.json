@@ -16,30 +16,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/api/streak/route.js"
     ],
-    "/quiz/page": [
+    "/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/quiz/page.js"
+      "static/chunks/app/dashboard/page.js"
     ],
-    "/api/quiz/start/route": [
+    "/api/dashboard/summary/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/quiz/start/route.js"
+      "static/chunks/app/api/dashboard/summary/route.js"
     ],
-    "/vault/page": [
+    "/api/reports/heatmap/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/vault/page.js"
+      "static/chunks/app/api/reports/heatmap/route.js"
     ],
-    "/api/quiz/answer/route": [
+    "/phishing/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/quiz/answer/route.js"
-    ],
-    "/api/quiz/finish/route": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/api/quiz/finish/route.js"
+      "static/chunks/app/phishing/page.js"
     ]
   }
 }

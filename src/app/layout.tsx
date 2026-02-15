@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "AmanTN — Cybersecurity Awareness",
+  title: "faya9ni.tn — Cybersecurity Awareness",
   description: "AI-powered cybersecurity awareness & threat reporting platform",
 };
 
@@ -22,7 +22,7 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="border-t border-white/5 py-6 text-center text-sm text-gray-600">
-            © {new Date().getFullYear()} AmanTN — Stay safe online.
+            © {new Date().getFullYear()} faya9ni.tn — Stay safe online.
           </footer>
         </LanguageProvider>
       </body>
