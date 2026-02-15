@@ -53,7 +53,34 @@ export interface UserStreak {
   updated_at: string;
 }
 
-/* ── Dashboard response ── */
+/* ── Dashboard summary ── */
+export interface DashboardLastReport {
+  id: string;
+  createdAt: string;
+  normalizedUrl: string | null;
+  overallRisk: "Low" | "Medium" | "High" | "Critical";
+  riskScore: number;
+}
+
+export interface DashboardSummary {
+  success: true;
+  user: { name?: string };
+  vault: { isUnlocked: boolean };
+  phishing: {
+    analyzedCount: number;
+    reportedCount: number;
+    highRiskCount: number;
+    lastReports: DashboardLastReport[];
+  };
+  quiz: {
+    dailyStreak: { current: number; best: number };
+    answerStreak: { current: number; best: number };
+    totalSessions: number;
+    lastSession: { percent: number; correct: number; total: number; completedAt: string } | null;
+  };
+}
+
+/** @deprecated — kept for backward compat */
 export interface DashboardResponse {
   streak: {
     current: number;
