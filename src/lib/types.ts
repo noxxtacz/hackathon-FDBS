@@ -8,7 +8,7 @@ export interface AnalyzeResponse {
   score: number;
   label: RiskLabel;
   reasons: string[];
-  advice: string[];
+  advice: string;
 }
 
 /* ── Threat report ── */
@@ -33,8 +33,42 @@ export interface HeatmapRow {
 
 /* ── Quiz ── */
 export interface QuizQuestion {
-  id: number;
+  id: number | string;
   question: string;
   options: string[];
   correctIndex: number;
+}
+
+/* ── User streak ── */
+export interface UserStreak {
+  user_id: string;
+  current_streak: number;
+  longest_streak: number;
+  last_activity_date: string | null;
+  updated_at: string;
+}
+
+/* ── Dashboard response ── */
+export interface DashboardResponse {
+  streak: {
+    current: number;
+    longest: number;
+  };
+  reports: {
+    total: number;
+    recent: ThreatReport[];
+  };
+  quiz: {
+    totalAttempts: number;
+    averageScore: number;
+  };
+}
+
+/* ── Leaderboard entry ── */
+export interface LeaderboardEntry {
+  rank: number;
+  masked_email: string;
+  current_streak: number;
+  longest_streak: number;
+  total_reports: number;
 }
