@@ -2,17 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
 import { createSupabaseBrowser } from "@/lib/supabase/client";
 
 const links = [
   { href: "/", label: "Home" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/phishing", label: "Phishing" },
   { href: "/reports", label: "Reports" },
   { href: "/heatmap", label: "Heatmap" },
   { href: "/vault", label: "Vault" },
   { href: "/quiz", label: "Quiz" },
+  { href: "/leaderboard", label: "Scoreboard" },
 ];
 
 export default function Navbar() {
@@ -21,6 +23,15 @@ export default function Navbar() {
   const { user, loading } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [streak, setStreak] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) { setStreak(null); return; }
+    fetch("/api/streak")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d) setStreak(d.current ?? 0); })
+      .catch(() => {});
+  }, [user]);
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowser();
@@ -72,7 +83,15 @@ export default function Navbar() {
           {loading ? (
             <div className="h-8 w-8 animate-pulse rounded-full bg-white/10" />
           ) : user ? (
-            <div className="relative">
+            <div className="relative flex items-center gap-2">
+              {streak !== null && streak > 0 && (
+                <span className="flex items-center gap-1 rounded-full border border-orange-500/20 bg-orange-500/10 px-2 py-0.5 text-xs font-semibold text-orange-400">
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 003 2.48z" />
+                  </svg>
+                  {streak}
+                </span>
+              )}
               <button
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 text-xs font-bold text-slate-950 transition-transform hover:scale-110"

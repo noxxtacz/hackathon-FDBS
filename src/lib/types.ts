@@ -14,15 +14,20 @@ export interface AnalyzeResponse {
 /* ── Threat report ── */
 export interface ThreatReport {
   id: string;
+  created_at: string;
+  created_by: string | null;
   threat_type: string;
   governorate: string;
-  description: string;
-  solution: string;
-  defanged_url: string;
+  url_defanged: string | null;
+  description: string | null;
+  solution: string | null;
   risk_score: number;
   risk_label: RiskLabel;
-  reasons: string[];
-  created_at: string;
+  risk_reasons: string[];
+  image_path: string | null;
+  status: "pending" | "approved" | "rejected";
+  vote_count?: number;
+  user_voted?: boolean;
 }
 
 /* ── Heatmap row ── */
@@ -48,7 +53,34 @@ export interface UserStreak {
   updated_at: string;
 }
 
-/* ── Dashboard response ── */
+/* ── Dashboard summary ── */
+export interface DashboardLastReport {
+  id: string;
+  createdAt: string;
+  normalizedUrl: string | null;
+  overallRisk: "Low" | "Medium" | "High" | "Critical";
+  riskScore: number;
+}
+
+export interface DashboardSummary {
+  success: true;
+  user: { name?: string };
+  vault: { isUnlocked: boolean };
+  phishing: {
+    analyzedCount: number;
+    reportedCount: number;
+    highRiskCount: number;
+    lastReports: DashboardLastReport[];
+  };
+  quiz: {
+    dailyStreak: { current: number; best: number };
+    answerStreak: { current: number; best: number };
+    totalSessions: number;
+    lastSession: { percent: number; correct: number; total: number; completedAt: string } | null;
+  };
+}
+
+/** @deprecated — kept for backward compat */
 export interface DashboardResponse {
   streak: {
     current: number;
