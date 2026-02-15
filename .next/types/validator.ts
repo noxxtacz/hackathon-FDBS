@@ -155,6 +155,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../src/app/api/password-analyzer/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/password-analyzer">> = Specific
+  const handler = {} as typeof import("../../src/app/api/password-analyzer/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/api/quiz/start/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/quiz/start">> = Specific
@@ -213,6 +222,33 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/vault/blob">> = Specific
   const handler = {} as typeof import("../../src/app/api/vault/blob/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/vault/items/[id]/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/vault/items/[id]">> = Specific
+  const handler = {} as typeof import("../../src/app/api/vault/items/[id]/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/vault/items/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/vault/items">> = Specific
+  const handler = {} as typeof import("../../src/app/api/vault/items/route.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
+// Validate ../../src/app/api/vault/unlock/route.ts
+{
+  type __IsExpected<Specific extends RouteHandlerConfig<"/api/vault/unlock">> = Specific
+  const handler = {} as typeof import("../../src/app/api/vault/unlock/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check
