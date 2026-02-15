@@ -1,114 +1,124 @@
-import { NextResponse } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase/admin";
-import type { QuizQuestion } from "@/lib/types";
+import { NextRequest, NextResponse } from "next/server";
+import { createSupabaseServer } from "@/lib/supabase/server";
+import { StartQuizRequestSchema } from "@/lib/quiz/schemas";
+import type { ClientQuestion, StartQuizResponse, StreakSummary } from "@/lib/quiz/schemas";
+import {
+  getUserStreaks,
+  getRecentReports,
+  getGeneralQuestions,
+  createQuizSession,
+  createQuestionInstances,
+} from "@/lib/quiz/db";
+import { generateQuestionsFromReports } from "@/lib/quiz/groq";
 
 /**
- * GET /api/quiz/start
- * Public – returns a mix of 6 static + up to 4 community questions.
+ * POST /api/quiz/start
+ * Auth required.
+ * Body: { count: 1-10, topic?, difficulty? }
+ *
+ * Flow:
+ *  1. Load recent threat reports
+ *  2. Generate report-based questions via Groq (60% if reports exist)
+ *  3. Fill remaining with general DB questions
+ *  4. Create session + instances in DB
+ *  5. Return questions WITHOUT correctIndex
  */
-
-const STATIC_QUESTIONS: QuizQuestion[] = [
-  {
-    id: "s1",
-    question: "What is phishing?",
-    options: [
-      "A type of fishing sport",
-      "A cyberattack that tricks you into revealing personal info",
-      "A software update method",
-      "A type of firewall",
-    ],
-    correctIndex: 1,
-  },
-  {
-    id: "s2",
-    question:
-      "Which of these is a red flag in a suspicious email?",
-    options: [
-      "Sender address matches the company domain",
-      "Professional language and grammar",
-      "Urgent request to click a link immediately",
-      "Email has an unsubscribe option",
-    ],
-    correctIndex: 2,
-  },
-  {
-    id: "s3",
-    question: "What does HTTPS indicate about a website?",
-    options: [
-      "The website is 100% safe",
-      "The connection is encrypted between you and the server",
-      "The website is government-approved",
-      "The website has no ads",
-    ],
-    correctIndex: 1,
-  },
-  {
-    id: "s4",
-    question:
-      "What should you do if you receive a suspicious SMS with a link?",
-    options: [
-      "Click the link to investigate",
-      "Forward it to all your contacts",
-      "Delete it and block the sender",
-      "Reply asking who sent it",
-    ],
-    correctIndex: 2,
-  },
-  {
-    id: "s5",
-    question: "What is two-factor authentication (2FA)?",
-    options: [
-      "Using two different passwords",
-      "An extra verification step beyond your password",
-      "Having two email accounts",
-      "Logging in from two devices",
-    ],
-    correctIndex: 1,
-  },
-  {
-    id: "s6",
-    question: "Which password is the strongest?",
-    options: [
-      "password123",
-      "MyDog'sName",
-      "Tr0ub4dor&3",
-      "j7$kL9#mQ2!xP",
-    ],
-    correctIndex: 3,
-  },
-];
-
-export async function GET() {
+export async function POST(req: NextRequest) {
   try {
-    // Fetch community-submitted approved quiz questions (if table exists)
-    let communityQuestions: QuizQuestion[] = [];
-    try {
-      const { data } = await supabaseAdmin
-        .from("quiz_questions")
-        .select("id, question, options, correct_index")
-        .eq("status", "approved")
-        .limit(10);
+    const supabase = await createSupabaseServer();
+    const { data: { user }, error: authErr } = await supabase.auth.getUser();
 
-      if (data && data.length > 0) {
-        // Shuffle and pick up to 4
-        const shuffled = data.sort(() => Math.random() - 0.5).slice(0, 4);
-        communityQuestions = shuffled.map((q) => ({
-          id: q.id,
-          question: q.question,
-          options: q.options as string[],
-          correctIndex: q.correct_index as number,
-        }));
-      }
-    } catch {
-      // Table may not exist yet – that's fine, use static only
+    if (authErr || !user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 });
     }
 
-    const questions = [...STATIC_QUESTIONS, ...communityQuestions];
+    const body = await req.json().catch(() => ({}));
+    const parsed = StartQuizRequestSchema.safeParse(body);
 
-    // Shuffle final set
-    const shuffled = questions.sort(() => Math.random() - 0.5);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request", details: parsed.error.issues },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ questions: shuffled });
+    const { count, topic, difficulty } = parsed.data;
+
+    // 1. Load recent reports for Groq-based question generation
+    const reports = await getRecentReports(10);
+
+    // 2. Split: 60% report-based / 40% general if reports exist
+    const reportCount = reports.length > 0 ? Math.ceil(count * 0.6) : 0;
+
+    // 3. Generate report-based questions via Groq
+    const reportQuestions = reportCount > 0
+      ? await generateQuestionsFromReports({
+          reports,
+          count: reportCount,
+          topic,
+          difficulty,
+        })
+      : [];
+
+    // 4. Fetch general questions from DB to fill remaining
+    const actualGeneralNeeded = count - reportQuestions.length;
+    const generalQuestions = actualGeneralNeeded > 0
+      ? await getGeneralQuestions({
+          topic,
+          difficulty,
+          limit: actualGeneralNeeded,
+        })
+      : [];
+
+    // 5. Combine and shuffle
+    const allQuestions = [...reportQuestions, ...generalQuestions]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, count);
+
+    if (allQuestions.length === 0) {
+      return NextResponse.json(
+        { error: "No questions available. Please try a different topic." },
+        { status: 404 }
+      );
+    }
+
+    // 6. Create quiz session + question instances in DB
+    const session = await createQuizSession(user.id, allQuestions.length);
+    const instances = await createQuestionInstances(session.id, allQuestions);
+
+    // 7. Build streak summary
+    const streaks = await getUserStreaks(user.id);
+    const streakSummary: StreakSummary = {
+      daily: {
+        current: streaks.current_streak,
+        best: streaks.longest_streak,
+        lastQuizDate: streaks.last_activity_date,
+      },
+      answer: {
+        current: streaks.current_answer_streak,
+        best: streaks.best_answer_streak,
+      },
+    };
+
+    // 8. Return questions WITHOUT correctIndex
+    const clientQuestions: ClientQuestion[] = instances.map((inst) => ({
+      id: inst.id,
+      source: inst.source,
+      reportId: inst.report_id,
+      question: inst.question,
+      options: inst.options as [string, string, string, string],
+      topic: allQuestions.find((q) => q.question === inst.question)?.topic,
+      difficulty: allQuestions.find((q) => q.question === inst.question)?.difficulty,
+    }));
+
+    const response: StartQuizResponse = {
+      success: true,
+      sessionId: session.id,
+      questions: clientQuestions,
+      streaks: streakSummary,
+    };
+
+    return NextResponse.json(response);
   } catch (err) {
     console.error("[quiz/start]", err);
     return NextResponse.json(

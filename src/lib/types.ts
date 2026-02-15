@@ -14,15 +14,20 @@ export interface AnalyzeResponse {
 /* ── Threat report ── */
 export interface ThreatReport {
   id: string;
+  created_at: string;
+  created_by: string | null;
   threat_type: string;
   governorate: string;
-  description: string;
-  solution: string;
-  defanged_url: string;
+  url_defanged: string | null;
+  description: string | null;
+  solution: string | null;
   risk_score: number;
   risk_label: RiskLabel;
-  reasons: string[];
-  created_at: string;
+  risk_reasons: string[];
+  image_path: string | null;
+  status: "pending" | "approved" | "rejected";
+  vote_count?: number;
+  user_voted?: boolean;
 }
 
 /* ── Heatmap row ── */

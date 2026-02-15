@@ -1,5 +1,7 @@
 {
-  "/api/password-analyzer/route": "app/api/password-analyzer/route.js",
-  "/vault/page": "app/vault/page.js",
-  "/phishing/page": "app/phishing/page.js"
+  "/api/quiz/start/route": "app/api/quiz/start/route.js",
+  "/api/quiz/answer/route": "app/api/quiz/answer/route.js",
+  "/api/quiz/finish/route": "app/api/quiz/finish/route.js",
+  "/page": "app/page.js",
+  "/quiz/page": "app/quiz/page.js"
 }

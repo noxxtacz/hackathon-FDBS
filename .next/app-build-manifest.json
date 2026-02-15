@@ -11,25 +11,25 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
-    "/vault/page": [
+    "/quiz/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/vault/page.js"
+      "static/chunks/app/quiz/page.js"
     ],
-    "/api/password-analyzer/route": [
+    "/api/quiz/start/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/password-analyzer/route.js"
+      "static/chunks/app/api/quiz/start/route.js"
     ],
-    "/api/vault/unlock/route": [
+    "/api/quiz/answer/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/api/vault/unlock/route.js"
+      "static/chunks/app/api/quiz/answer/route.js"
     ],
-    "/phishing/page": [
+    "/api/quiz/finish/route": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/phishing/page.js"
+      "static/chunks/app/api/quiz/finish/route.js"
     ]
   }
 }
